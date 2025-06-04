@@ -11,6 +11,7 @@ class UpdatePage extends Component
     public LaundryService $laundryService;
     public $name = '';
     public $price_per_kg = '';
+    public $estimated_time = '';
 
     public function mount(LaundryService $laundryService)
     {
@@ -18,13 +19,15 @@ class UpdatePage extends Component
         $this->laundryService = $laundryService;
         $this->name = $laundryService->name;
         $this->price_per_kg = $laundryService->price_per_kg;
+        $this->estimated_time = $laundryService->estimated_time;
     }
 
     public function rules()
     {
         return [
-            'name' => ['required', 'string', 'min:2', 'max:100', Rule::unique('laundry_services','name')->ignore($this->laundryService->id)],
+            'name' => ['required', 'string', 'min:2', 'max:100', Rule::unique('laundry_services', 'name')->ignore($this->laundryService->id)],
             'price_per_kg' => ['required', 'numeric', 'min:0', 'max:9999.99'],
+            'estimated_time' => ['required', 'integer', 'min:0', 'max:9999'],
         ];
     }
 
@@ -36,11 +39,11 @@ class UpdatePage extends Component
     public function update()
     {
         $this->authorize('update', $this->laundryService);
-        
+
         $validatedData = $this->validate();
 
         $this->laundryService->update($validatedData);
-        
+
         session()->flash('success', 'Laundry service updated successfully!');
     }
 

@@ -31,7 +31,7 @@ Route::middleware(['auth'])->group(function () {
     Route::prefix('laundry-services')->name('laundry-services.')->group(function () {
         Route::get('', LaundryServiceTable::class)->name('table');
         Route::get('create', LaundryServiceCreatePage::class)->name('create');
-        Route::get('{user}/edit', LaundryServiceUpdatePage::class)->name('edit');
+        Route::get('{laundryService}/edit', LaundryServiceUpdatePage::class)->name('edit');
     });
 
     Route::prefix('settings')->name('settings.')->group(function () {

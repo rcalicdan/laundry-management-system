@@ -23,6 +23,8 @@
                     wire:navigate>{{ __('Users') }}</flux:navlist.item>
                 @endcan
 
+                <flux:navlist.item icon="clipboard-document" :href="route('laundry-services.table')" :current="request()->routeIs('laundry-services*')"
+                    wire:navigate>{{ __('Laundry Services') }}</flux:navlist.item>
             </flux:navlist.group>
         </flux:navlist>
 

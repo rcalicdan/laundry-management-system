@@ -10,6 +10,7 @@ class LaundryService extends Model
     
     protected $fillable = [
         'name',
-        'price_per_kg'
+        'price_per_kg',
+        'estimated_time',
     ];
 }

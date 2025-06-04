@@ -28,6 +28,9 @@
                                 Price per KG</th>
                             <th scope="col"
                                 class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                                Estimited Completion</th>
+                            <th scope="col"
+                                class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                                 Created Date</th>
                             <th scope="col"
                                 class="px-6 py-3 text-center text-xs font-medium text-gray-500 uppercase tracking-wider">
@@ -44,6 +47,9 @@
                             <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-700">{{ $service->name }}</td>
                             <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-700">
                                 ₱{{ number_format($service->price_per_kg, 2) }}
+                            </td>
+                            <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-700">
+                                {{ $service->estimated_time ?? 'Unknown'}} minutes
                             </td>
                             <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-700">
                                 {{ $service->created_at->format('M d, Y') }}

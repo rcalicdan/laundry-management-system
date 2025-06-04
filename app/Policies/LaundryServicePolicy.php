@@ -19,7 +19,7 @@ class LaundryServicePolicy
     /**
      * Determine whether the user can update the model.
      */
-    public function update(User $user, User $model): bool
+    public function update(User $user, LaundryService $model): bool
     {
         return $user->isAdmin();
     }
@@ -27,12 +27,8 @@ class LaundryServicePolicy
     /**
      * Determine whether the user can delete the model.
      */
-    public function delete(User $user, User $model): bool
+    public function delete(User $user, LaundryService $model): bool
     {
-        if ($user->id == $model->id) {
-            return false;
-        }
-
         return $user->isAdmin();
     }
 }
