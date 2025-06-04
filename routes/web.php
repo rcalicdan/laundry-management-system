@@ -40,6 +40,12 @@ Route::middleware(['auth'])->group(function () {
         Route::get('{customer}/edit', \App\Livewire\Customer\UpdatePage::class)->name('edit');
     });
 
+    Route::prefix('orders')->name('orders.')->group(function () {
+    Route::get('', \App\Livewire\Orders\Table::class)->name('table');
+    Route::get('create', \App\Livewire\Orders\CreatePage::class)->name('create');
+    Route::get('{order}/edit', \App\Livewire\Orders\UpdatePage::class)->name('edit');
+});
+
     Route::prefix('settings')->name('settings.')->group(function () {
         Route::get('profile', Profile::class)->name('profile');
         Route::get('password', Password::class)->name('password');
