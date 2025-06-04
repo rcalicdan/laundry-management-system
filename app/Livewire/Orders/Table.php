@@ -22,6 +22,7 @@ class Table extends Component
 
     #[Url(as: 'date')]
     public $searchDate = '';
+    public $isSearchModalOpen = false;
 
     public function performSearch()
     {
