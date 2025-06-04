@@ -7,13 +7,15 @@ use Illuminate\Support\Collection;
 
 class OrderCalculatorService
 {
-    public function calculateOrderItemSubtotals(array $orderItems, Collection $laundryServices): array
+    private const EXPRESS_SURCHARGE_PERCENTAGE = 15;
+
+    public function calculateOrderItemSubtotals(array $orderItems, Collection $laundryServices, bool $isExpress = false): array
     {
         foreach ($orderItems as $index => &$item) {
-            $subtotal = $this->calculateItemSubtotal($item, $laundryServices);
+            $subtotal = $this->calculateItemSubtotal($item, $laundryServices, $isExpress);
             $item['subtotal'] = $subtotal;
         }
-        
+
         return $orderItems;
     }
 
@@ -22,7 +24,7 @@ class OrderCalculatorService
         return collect($orderItems)->sum('subtotal');
     }
 
-    private function calculateItemSubtotal(array &$item, Collection $laundryServices): float
+    private function calculateItemSubtotal(array &$item, Collection $laundryServices, bool $isExpress = false): float
     {
         if (empty($item['laundry_service_id']) || empty($item['quantity'])) {
             $item['price_per_kg'] = 0;
@@ -35,8 +37,19 @@ class OrderCalculatorService
             return 0;
         }
 
-        $item['price_per_kg'] = $service->price_per_kg;
-        
-        return $service->price_per_kg * $item['quantity'];
+        $basePrice = $service->price_per_kg;
+
+        if ($isExpress) {
+            $basePrice = $this->applyExpressSurcharge($basePrice);
+        }
+
+        $item['price_per_kg'] = $basePrice;
+
+        return $basePrice * $item['quantity'];
+    }
+
+    private function applyExpressSurcharge(float $basePrice): float
+    {
+        return $basePrice * (1 + self::EXPRESS_SURCHARGE_PERCENTAGE / 100);
     }
 }
