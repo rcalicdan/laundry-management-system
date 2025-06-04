@@ -21,8 +21,7 @@
         <form wire:submit.prevent='performSearch' class="space-y-4 mt-4">
             {{ $slot }}
             <div class="mt-6 flex justify-end space-x-2">
-                <button type="button"
-                    @click="isSearchModalOpen = false; document.getElementById('search-id').value = ''"
+                <button type="button" @click="isSearchModalOpen = false" wire:click="clearSearch"
                     class="px-4 py-2 bg-gray-200 text-gray-800 rounded-md hover:bg-gray-300 transition">
                     Clear & Close
                 </button>
