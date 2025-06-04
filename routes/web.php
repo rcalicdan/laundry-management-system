@@ -1,5 +1,8 @@
 <?php
 
+use App\Livewire\LaundryService\CreatePage as LaundryServiceCreatePage;
+use App\Livewire\LaundryService\Table as LaundryServiceTable;
+use App\Livewire\LaundryService\UpdatePage as LaundryServiceUpdatePage;
 use App\Livewire\Settings\Appearance;
 use App\Livewire\Settings\Password;
 use App\Livewire\Settings\Profile;
@@ -23,6 +26,12 @@ Route::middleware(['auth'])->group(function () {
         Route::get('', Table::class)->name('table');
         Route::get('create', CreatePage::class)->name('create');
         Route::get('{user}/edit', UpdatePage::class)->name('edit');
+    });
+
+    Route::prefix('laundry-services')->name('laundry-services.')->group(function () {
+        Route::get('', LaundryServiceTable::class)->name('table');
+        Route::get('create', LaundryServiceCreatePage::class)->name('create');
+        Route::get('{user}/edit', LaundryServiceUpdatePage::class)->name('edit');
     });
 
     Route::prefix('settings')->name('settings.')->group(function () {
