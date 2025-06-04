@@ -42,26 +42,44 @@
                         <div class="ml-3">
                             <p class="text-sm text-blue-800">
                                 Order created on {{ $order->created_at->format('M d, Y \a\t g:i A') }}
-                                | Status: <span class="font-semibold">{{ $order->status->label() }}</span>
                             </p>
                         </div>
                     </div>
                 </div>
 
-                <!-- Customer Selection -->
-                <div>
-                    <label for="customer_id" class="block text-sm font-medium text-gray-700">Customer</label>
-                    <select id="customer_id" wire:model.live='customer_id'
-                        class="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm"
-                        required>
-                        <option value="">Select a customer</option>
-                        @foreach ($customers as $customer)
-                        <option value="{{ $customer->id }}">{{ $customer->name }} - {{ $customer->phone }}</option>
-                        @endforeach
-                    </select>
-                    @error('customer_id')
-                    <p class="mt-1 text-sm text-red-600">{{ $message }}</p>
-                    @enderror
+                <!-- Customer Selection and Status in a Grid -->
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    <!-- Customer Selection -->
+                    <div>
+                        <label for="customer_id" class="block text-sm font-medium text-gray-700">Customer</label>
+                        <select id="customer_id" wire:model.live='customer_id'
+                            class="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm"
+                            required>
+                            <option value="">Select a customer</option>
+                            @foreach ($customers as $customer)
+                            <option value="{{ $customer->id }}">{{ $customer->name }} - {{ $customer->phone }}</option>
+                            @endforeach
+                        </select>
+                        @error('customer_id')
+                        <p class="mt-1 text-sm text-red-600">{{ $message }}</p>
+                        @enderror
+                    </div>
+
+                    <!-- Order Status -->
+                    <div>
+                        <label for="status" class="block text-sm font-medium text-gray-700">Order Status</label>
+                        <select id="status" wire:model.live='status'
+                            class="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm"
+                            required>
+                            <option value="">Select status</option>
+                            @foreach ($statusOptions as $value => $label)
+                            <option value="{{ $value }}">{{ $label }}</option>
+                            @endforeach
+                        </select>
+                        @error('status')
+                        <p class="mt-1 text-sm text-red-600">{{ $message }}</p>
+                        @enderror
+                    </div>
                 </div>
 
                 <!-- Express Service -->

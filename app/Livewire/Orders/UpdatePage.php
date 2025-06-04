@@ -5,6 +5,7 @@ namespace App\Livewire\Orders;
 use App\Models\Order;
 use App\Models\Customer;
 use App\Models\LaundryService;
+use App\Enums\OrderStatus;
 use App\Services\OrderCalculatorService;
 use App\Services\OrderUpdateService;
 use Illuminate\Support\Facades\Log;
@@ -15,11 +16,13 @@ class UpdatePage extends Component
 {
     public Order $order;
     public $customer_id;
+    public $status;
     public $special_instructions;
     public $is_express = false;
     public $orderItems = [];
     public $customers;
     public $laundryServices;
+    public $statusOptions;
 
     private OrderCalculatorService $calculator;
     private OrderUpdateService $orderUpdateService;
@@ -42,6 +45,7 @@ class UpdatePage extends Component
     {
         return [
             'customer_id' => ['required', 'exists:customers,id'],
+            'status' => ['required', 'in:' . implode(',', OrderStatus::values())],
             'special_instructions' => ['nullable', 'string', 'max:500'],
             'is_express' => ['boolean'],
             'orderItems' => ['required', 'array', 'min:1'],
@@ -118,6 +122,7 @@ class UpdatePage extends Component
         try {
             $orderData = [
                 'customer_id' => $this->customer_id,
+                'status' => OrderStatus::from($this->status),
                 'special_instructions' => $this->special_instructions,
                 'is_express' => $this->is_express,
                 'total_amount' => $totalAmount,
@@ -140,6 +145,7 @@ class UpdatePage extends Component
     private function loadOrderData(): void
     {
         $this->customer_id = $this->order->customer_id;
+        $this->status = $this->order->status->value;
         $this->special_instructions = $this->order->special_instructions;
         $this->is_express = $this->order->is_express;
 
@@ -163,6 +169,7 @@ class UpdatePage extends Component
     {
         $this->customers = Customer::orderBy('name')->get();
         $this->laundryServices = LaundryService::orderBy('name')->get();
+        $this->statusOptions = OrderStatus::options();
     }
 
     private function shouldSkipValidation(string $propertyName): bool

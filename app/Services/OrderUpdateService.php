@@ -4,6 +4,7 @@ namespace App\Services;
 
 use App\Models\Order;
 use App\Models\LaundryService;
+use App\Enums\OrderStatus;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
 use Exception;
@@ -25,6 +26,7 @@ class OrderUpdateService
     {
         $order->update([
             'customer_id' => $orderData['customer_id'],
+            'status' => $orderData['status'],
             'special_instructions' => $orderData['special_instructions'],
             'is_express' => $orderData['is_express'],
             'total_amount' => $orderData['total_amount'],
@@ -92,6 +94,7 @@ class OrderUpdateService
             'order_id' => $order->id,
             'order_number' => $order->order_number,
             'customer_id' => $orderData['customer_id'],
+            'status' => $orderData['status']->value,
             'user_id' => auth()->id(),
             'total_amount' => $order->total_amount,
             'items_count' => count($orderItems),
