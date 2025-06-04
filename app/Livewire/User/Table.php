@@ -40,6 +40,12 @@ class Table extends Component
         $this->resetPage();
     }
 
+    public function delete(User $user)
+    {
+        $user->delete();
+        session()->flash('success', 'User deleted successfully.');
+    }
+
     public function render()
     {
         $users = User::when($this->searchId, function ($query) {

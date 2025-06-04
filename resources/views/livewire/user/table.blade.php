@@ -10,6 +10,7 @@
                 <x-utils.create-button createButtonName="Add New User" :route="route('users.create')" />
             </x-contents.table-head>
 
+            <x-flash-session/>
             <!-- Table -->
             <div class="overflow-x-auto bg-white shadow-md rounded-lg">
                 <table class="min-w-full divide-y divide-gray-200">
@@ -52,8 +53,8 @@
                             <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-700">
                                 {{ $user->created_at->format('M d, Y') }}</td>
                             <td class="px-6 py-4 whitespace-nowrap text-right text-sm font-medium space-x-2">
-                                <x-utils.update-button route="#" />
-                                <x-utils.delete-button />
+                                <x-utils.update-button :route="route('users.edit', [$user->id])" />
+                                <x-utils.delete-button wireClick="delete({{ $user->id }})"/>
                             </td>
                         </tr>
                         @endforeach
