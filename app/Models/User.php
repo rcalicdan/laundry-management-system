@@ -48,14 +48,16 @@ class User extends Authenticatable
         return [
             'email_verified_at' => 'datetime',
             'password' => 'hashed',
+            'name' => 'string',
         ];
     }
 
-    /**
-     * Get the user's initials
-     */
     public function initials(): string
     {
+        if (empty($this->name)) {
+            return '';
+        }
+
         return Str::of($this->name)
             ->explode(' ')
             ->map(fn(string $name) => Str::of($name)->substr(0, 1))

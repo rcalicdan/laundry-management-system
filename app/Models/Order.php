@@ -30,7 +30,17 @@ class Order extends Model
         'status' => OrderStatus::class,
     ];
 
-    // Relationships
+    protected static function boot()
+    {
+        parent::boot();
+
+        static::creating(function ($order) {
+            if (empty($order->order_number)) {
+                $order->order_number = 'ORD-' . date('Ymd') . '-' . str_pad(static::max('id') + 1, 4, '0', STR_PAD_LEFT);
+            }
+        });
+    }
+
     public function customer(): BelongsTo
     {
         return $this->belongsTo(Customer::class);
@@ -70,16 +80,5 @@ class Order extends Model
     {
         $this->total_amount = $this->orderItems->sum('subtotal');
         $this->save();
-    }
-
-    protected static function boot()
-    {
-        parent::boot();
-        
-        static::creating(function ($order) {
-            if (empty($order->order_number)) {
-                $order->order_number = 'ORD-' . date('Ymd') . '-' . str_pad(static::max('id') + 1, 4, '0', STR_PAD_LEFT);
-            }
-        });
     }
 }
