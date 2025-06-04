@@ -6,6 +6,7 @@ namespace App\Models;
 
 use App\Enums\UserRoles;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
+use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
 use Illuminate\Support\Str;
@@ -61,7 +62,7 @@ class User extends Authenticatable
             ->implode('');
     }
 
-    public function isAdmin(): bool   
+    public function isAdmin(): bool
     {
         return $this->role === UserRoles::ADMIN->value;
     }
@@ -69,5 +70,10 @@ class User extends Authenticatable
     public function isEmployee(): bool
     {
         return $this->role === UserRoles::EMPLOYEE->value;
+    }
+
+    public function orders(): HasMany
+    {
+        return $this->hasMany(Order::class);
     }
 }
