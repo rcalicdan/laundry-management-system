@@ -6,11 +6,10 @@ use App\Models\Order;
 use App\Models\Customer;
 use App\Models\LaundryService;
 use App\Services\OrderCalculatorService;
-use App\Services\OrderCreationService;
+use App\Services\OrderUpdateService;
 use Illuminate\Support\Facades\Log;
 use Livewire\Component;
 use Exception;
-use Illuminate\Support\Facades\DB;
 
 class UpdatePage extends Component
 {
@@ -21,6 +20,15 @@ class UpdatePage extends Component
     public $orderItems = [];
     public $customers;
     public $laundryServices;
+
+    private OrderCalculatorService $calculator;
+    private OrderUpdateService $orderUpdateService;
+
+    public function boot(OrderCalculatorService $calculator, OrderUpdateService $orderUpdateService)
+    {
+        $this->calculator = $calculator;
+        $this->orderUpdateService = $orderUpdateService;
+    }
 
     public function mount(Order $order)
     {
@@ -59,7 +67,7 @@ class UpdatePage extends Component
     public function addOrderItem(): void
     {
         $this->orderItems[] = [
-            'id' => null, 
+            'id' => null,
             'laundry_service_id' => '',
             'quantity' => '',
             'price_per_kg' => 0,
@@ -79,8 +87,7 @@ class UpdatePage extends Component
 
     public function calculateSubtotals(): void
     {
-        $calculator = new OrderCalculatorService();
-        $this->orderItems = $calculator->calculateOrderItemSubtotals(
+        $this->orderItems = $this->calculator->calculateOrderItemSubtotals(
             $this->orderItems,
             $this->laundryServices,
             $this->is_express
@@ -91,8 +98,7 @@ class UpdatePage extends Component
 
     public function getTotalAmount(): float
     {
-        $calculator = new OrderCalculatorService();
-        return $calculator->calculateTotalAmount($this->orderItems);
+        return $this->calculator->calculateTotalAmount($this->orderItems);
     }
 
     public function update()
@@ -100,7 +106,7 @@ class UpdatePage extends Component
         $this->authorize('update', $this->order);
         $this->validate();
         $this->calculateSubtotals();
-        
+
         Log::debug('Order items before update:', $this->orderItems);
         $totalAmount = $this->getTotalAmount();
 
@@ -110,7 +116,15 @@ class UpdatePage extends Component
         }
 
         try {
-            $this->updateOrder($totalAmount);
+            $orderData = [
+                'customer_id' => $this->customer_id,
+                'special_instructions' => $this->special_instructions,
+                'is_express' => $this->is_express,
+                'total_amount' => $totalAmount,
+            ];
+
+            $this->orderUpdateService->updateOrder($this->order, $orderData, $this->orderItems);
+
             session()->flash('success', 'Order updated successfully.');
             return $this->redirectRoute('orders.table', navigate: true);
         } catch (Exception $e) {
@@ -163,91 +177,6 @@ class UpdatePage extends Component
         return str_contains($propertyName, 'laundry_service_id')
             || str_contains($propertyName, 'quantity')
             || $propertyName === 'is_express';
-    }
-
-    private function updateOrder(float $totalAmount): void
-    {
-        DB::transaction(function () use ($totalAmount) {
-            // Update order record
-            $this->order->update([
-                'customer_id' => $this->customer_id,
-                'special_instructions' => $this->special_instructions,
-                'is_express' => $this->is_express,
-                'total_amount' => $totalAmount,
-            ]);
-
-            // Handle order items
-            $this->updateOrderItems();
-
-            // Recalculate and validate total
-            $this->validateOrderTotal();
-        });
-
-        Log::info('Order updated successfully', [
-            'order_id' => $this->order->id,
-            'order_number' => $this->order->order_number,
-            'customer_id' => $this->order->customer_id,
-            'user_id' => auth()->id(),
-            'total_amount' => $this->order->total_amount,
-            'items_count' => count($this->orderItems),
-        ]);
-    }
-
-    private function updateOrderItems(): void
-    {
-        $existingItemIds = collect($this->orderItems)
-            ->pluck('id')
-            ->filter()
-            ->toArray();
-
-        $this->order->orderItems()
-            ->whereNotIn('id', $existingItemIds)
-            ->delete();
-
-        foreach ($this->orderItems as $item) {
-            if ($this->isValidOrderItem($item)) {
-                $this->updateOrCreateOrderItem($item);
-            }
-        }
-    }
-
-    private function isValidOrderItem(array $item): bool
-    {
-        return !empty($item['laundry_service_id']) && $item['quantity'] > 0;
-    }
-
-    private function updateOrCreateOrderItem(array $item): void
-    {
-        $orderItemData = [
-            'order_id' => $this->order->id,
-            'laundry_service_id' => $item['laundry_service_id'],
-            'quantity_kg' => $item['quantity'],
-            'unit_price' => $item['price_per_kg'],
-            'subtotal' => $item['subtotal'],
-            'notes' => $item['notes'] ?? null,
-        ];
-
-        if ($item['id']) {
-            // Update existing item
-            $this->order->orderItems()
-                ->where('id', $item['id'])
-                ->update($orderItemData);
-        } else {
-            // Create new item
-            $this->order->orderItems()->create($orderItemData);
-        }
-    }
-
-    private function validateOrderTotal(): void
-    {
-        $actualTotal = $this->order->orderItems()->sum('subtotal');
-        $expectedTotal = $this->order->total_amount;
-
-        if (abs($actualTotal - $expectedTotal) > 0.01) {
-            throw new Exception("Order total mismatch. Expected: {$expectedTotal}, Actual: {$actualTotal}");
-        }
-
-        $this->order->update(['total_amount' => $actualTotal]);
     }
 
     private function handleOrderUpdateError(Exception $e, float $totalAmount): void
