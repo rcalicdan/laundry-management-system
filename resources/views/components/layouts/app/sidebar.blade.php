@@ -30,6 +30,10 @@
                 <flux:navlist.item icon="user-group" :href="route('customers.table')"
                     :current="request()->routeIs('customers*')" wire:navigate>{{ __('Customers') }}
                 </flux:navlist.item>
+
+                 <flux:navlist.item icon="document-currency-dollar" :href="route('orders.table')"
+                    :current="request()->routeIs('orders*')" wire:navigate>{{ __('Orders') }}
+                </flux:navlist.item>
             </flux:navlist.group>
         </flux:navlist>
 
