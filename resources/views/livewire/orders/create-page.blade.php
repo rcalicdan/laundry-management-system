@@ -48,7 +48,7 @@
                     <input id="is_express" type="checkbox" wire:model.live='is_express'
                         class="h-4 w-4 text-indigo-600 focus:ring-indigo-500 border-gray-300 rounded">
                     <label for="is_express" class="ml-2 block text-sm text-gray-900">
-                        Express Service (Additional charges may apply)
+                        Express Service (15% charges apply to all service price)
                     </label>
                 </div>
 

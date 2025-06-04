@@ -77,7 +77,8 @@ class CreatePage extends Component
         $calculator = new OrderCalculatorService();
         $this->orderItems = $calculator->calculateOrderItemSubtotals(
             $this->orderItems,
-            $this->laundryServices
+            $this->laundryServices,
+            $this->is_express 
         );
 
         Log::debug('Calculated order items:', $this->orderItems);
@@ -138,7 +139,8 @@ class CreatePage extends Component
     private function shouldRecalculateSubtotals(string $propertyName): bool
     {
         return str_contains($propertyName, 'laundry_service_id')
-            || str_contains($propertyName, 'quantity');
+            || str_contains($propertyName, 'quantity')
+            || $propertyName === 'is_express'; 
     }
 
     private function getOrderData(float $totalAmount): array
