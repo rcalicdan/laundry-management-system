@@ -1,4 +1,3 @@
-{{-- resources/views/livewire/order/create-page.blade.php --}}
 <section class="w-full">
     <x-contents.heading title="Create New Order" />
 
@@ -42,29 +41,6 @@
                     @error('customer_id')
                         <p class="mt-1 text-sm text-red-600">{{ $message }}</p>
                     @enderror
-                </div>
-
-                <!-- Pickup Date -->
-                <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-                    <div>
-                        <label for="pickup_date" class="block text-sm font-medium text-gray-700">Pickup Date</label>
-                        <input type="datetime-local" id="pickup_date" wire:model.live='pickup_date'
-                            class="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm"
-                            required>
-                        @error('pickup_date')
-                            <p class="mt-1 text-sm text-red-600">{{ $message }}</p>
-                        @enderror
-                    </div>
-
-                    <!-- Delivery Date -->
-                    <div>
-                        <label for="delivery_date" class="block text-sm font-medium text-gray-700">Delivery Date (Optional)</label>
-                        <input type="datetime-local" id="delivery_date" wire:model.live='delivery_date'
-                            class="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm">
-                        @error('delivery_date')
-                            <p class="mt-1 text-sm text-red-600">{{ $message }}</p>
-                        @enderror
-                    </div>
                 </div>
 
                 <!-- Express Service -->

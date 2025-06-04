@@ -31,8 +31,6 @@ class OrderCreationService
             'user_id' => auth()->id(),
             'status' => OrderStatus::PENDING,
             'total_amount' => $orderData['total_amount'],
-            'pickup_date' => $orderData['pickup_date'],
-            'delivery_date' => $orderData['delivery_date'],
             'special_instructions' => $orderData['special_instructions'],
             'is_express' => $orderData['is_express'],
         ]);
@@ -79,8 +77,8 @@ class OrderCreationService
         $orderItem = OrderItem::create([
             'order_id' => $order->id,
             'laundry_service_id' => $item['laundry_service_id'],
-            'quantity_kg' => $item['quantity'], 
-            'unit_price' => $item['price_per_kg'], 
+            'quantity_kg' => $item['quantity'],
+            'unit_price' => $item['price_per_kg'],
             'subtotal' => $item['subtotal'],
             'notes' => $item['notes'] ?? null,
         ]);

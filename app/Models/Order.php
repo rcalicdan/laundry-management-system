@@ -16,15 +16,11 @@ class Order extends Model
         'order_number',
         'status',
         'total_amount',
-        'pickup_date',
-        'delivery_date',
         'special_instructions',
         'is_express',
     ];
 
     protected $casts = [
-        'pickup_date' => 'datetime',
-        'delivery_date' => 'datetime',
         'total_amount' => 'decimal:2',
         'is_express' => 'boolean',
         'status' => OrderStatus::class,

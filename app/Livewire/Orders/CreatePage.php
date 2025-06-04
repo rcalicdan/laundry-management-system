@@ -14,8 +14,6 @@ use Exception;
 class CreatePage extends Component
 {
     public $customer_id;
-    public $pickup_date;
-    public $delivery_date;
     public $special_instructions;
     public $is_express = false;
     public $orderItems = [];
@@ -32,8 +30,6 @@ class CreatePage extends Component
     {
         return [
             'customer_id' => ['required', 'exists:customers,id'],
-            'pickup_date' => ['required', 'date', 'after_or_equal:today'],
-            'delivery_date' => ['nullable', 'date', 'after:pickup_date'],
             'special_instructions' => ['nullable', 'string', 'max:500'],
             'is_express' => ['boolean'],
             'orderItems' => ['required', 'array', 'min:1'],
@@ -149,8 +145,6 @@ class CreatePage extends Component
     {
         return [
             'customer_id' => $this->customer_id,
-            'pickup_date' => $this->pickup_date,
-            'delivery_date' => $this->delivery_date,
             'special_instructions' => $this->special_instructions,
             'is_express' => $this->is_express,
             'total_amount' => $totalAmount,
