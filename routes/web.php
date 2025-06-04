@@ -34,6 +34,12 @@ Route::middleware(['auth'])->group(function () {
         Route::get('{laundryService}/edit', LaundryServiceUpdatePage::class)->name('edit');
     });
 
+    Route::prefix('customers')->name('customers.')->group(function () {
+        Route::get('', \App\Livewire\Customer\Table::class)->name('table');
+        Route::get('create', \App\Livewire\Customer\CreatePage::class)->name('create');
+        Route::get('{customer}/edit', \App\Livewire\Customer\UpdatePage::class)->name('edit');
+    });
+
     Route::prefix('settings')->name('settings.')->group(function () {
         Route::get('profile', Profile::class)->name('profile');
         Route::get('password', Password::class)->name('password');
