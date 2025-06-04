@@ -7,21 +7,12 @@ use Illuminate\Auth\Access\Response;
 
 class UserPolicy
 {
-    public function before(User $user): bool|null
-    {
-        if ($user->isAdmin()) {
-            return true;
-        }
-
-        return null;
-    }
-    
     /**
      * Determine whether the user can view any models.
      */
     public function viewAny(User $user): bool
     {
-        return false;
+        return $user->isAdmin();
     }
 
     /**
@@ -29,7 +20,7 @@ class UserPolicy
      */
     public function view(User $user, User $model): bool
     {
-        return false;
+        return $user->isAdmin();
     }
 
     /**
@@ -37,7 +28,7 @@ class UserPolicy
      */
     public function create(User $user): bool
     {
-        return false;
+        return $user->isAdmin();
     }
 
     /**
@@ -45,7 +36,7 @@ class UserPolicy
      */
     public function update(User $user, User $model): bool
     {
-        return false;
+        return $user->isAdmin();
     }
 
     /**
@@ -53,6 +44,10 @@ class UserPolicy
      */
     public function delete(User $user, User $model): bool
     {
-        return false;
+        if ($user->id == $model->id) {
+            return false;
+        }
+        
+        return $user->isAdmin();
     }
 }

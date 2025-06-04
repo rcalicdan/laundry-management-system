@@ -10,7 +10,7 @@
                 <x-utils.create-button createButtonName="Add New User" :route="route('users.create')" />
             </x-contents.table-head>
 
-            <x-flash-session/>
+            <x-flash-session />
             <!-- Table -->
             <div class="overflow-x-auto bg-white shadow-md rounded-lg">
                 <table class="min-w-full divide-y divide-gray-200">
@@ -32,8 +32,9 @@
                                 class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                                 Hire Date</th>
                             <th scope="col"
-                                class="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">
-                                Actions</th>
+                                class="px-6 py-3 text-center text-xs font-medium text-gray-500 uppercase tracking-wider">
+                                Actions
+                            </th>
                         </tr>
                     </thead>
                     <tbody class="bg-white divide-y divide-gray-200">
@@ -52,9 +53,16 @@
                             </td>
                             <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-700">
                                 {{ $user->created_at->format('M d, Y') }}</td>
-                            <td class="px-6 py-4 whitespace-nowrap text-right text-sm font-medium space-x-2">
-                                <x-utils.update-button :route="route('users.edit', [$user->id])" />
-                                <x-utils.delete-button wireClick="delete({{ $user->id }})"/>
+                            <td class="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
+                                <div class="flex items-center justify-center space-x-2">
+                                    @can('update', $user)
+                                    <x-utils.update-button :route="route('users.edit', [$user->id])" />
+                                    @endcan
+
+                                    @can('delete', $user)
+                                    <x-utils.delete-button wireClick="delete({{ $user->id }})" />
+                                    @endcan
+                                </div>
                             </td>
                         </tr>
                         @endforeach

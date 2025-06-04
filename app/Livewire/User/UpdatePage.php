@@ -17,6 +17,7 @@ class UpdatePage extends Component
 
     public function mount(User $user)
     {
+        $this->authorize('update', $user);
         $this->user = $user;
         $this->name = $user->name;
         $this->email = $user->email;
@@ -48,6 +49,7 @@ class UpdatePage extends Component
 
     public function update()
     {
+        $this->authorize('update', $this->user);
         $this->validate();
         $updateData = [
             'name' => $this->name,

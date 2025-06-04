@@ -42,12 +42,15 @@ class Table extends Component
 
     public function delete(User $user)
     {
+        $this->authorize('delete', $user);
         $user->delete();
         session()->flash('success', 'User deleted successfully.');
     }
 
     public function render()
     {
+        $this->authorize('viewAny', User::class);
+
         $users = User::when($this->searchId, function ($query) {
             return $query->where('id', $this->searchId);
         })
