@@ -11,7 +11,7 @@ enum OrderStatus: string
 
     public function label(): string
     {
-        return match($this) {
+        return match ($this) {
             self::PENDING => 'Pending',
             self::IN_PROGRESS => 'In Progress',
             self::COMPLETED => 'Completed',
@@ -21,11 +21,24 @@ enum OrderStatus: string
 
     public function color(): string
     {
-        return match($this) {
+        return match ($this) {
             self::PENDING => 'bg-yellow-100 text-yellow-800',
             self::IN_PROGRESS => 'bg-blue-100 text-blue-800',
             self::COMPLETED => 'bg-green-100 text-green-800',
             self::DELIVERED => 'bg-purple-100 text-purple-800',
         };
+    }
+
+    public static function values(): array
+    {
+        return array_column(self::cases(), 'value');
+    }
+
+    public static function options(): array
+    {
+        return array_combine(
+            array_column(self::cases(), 'value'),
+            array_map(fn($case) => $case->label(), self::cases())
+        );
     }
 }

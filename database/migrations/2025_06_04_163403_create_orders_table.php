@@ -3,6 +3,7 @@
 use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
+use App\Enums\OrderStatus;
 
 return new class extends Migration
 {
@@ -12,12 +13,10 @@ return new class extends Migration
             $table->id();
             $table->string('order_number')->unique();
             $table->foreignId('customer_id')->constrained()->onDelete('cascade');
-            $table->foreignId('user_id')->constrained()->onDelete('cascade'); 
-            $table->enum('status', ['pending', 'in_progress', 'ready', 'completed', 'cancelled'])
-                  ->default('pending');
+            $table->foreignId('user_id')->constrained()->onDelete('cascade');
+            $table->enum('status', OrderStatus::values())
+                ->default(OrderStatus::PENDING->value);
             $table->decimal('total_amount', 10, 2)->default(0);
-            $table->datetime('pickup_date')->nullable();
-            $table->datetime('delivery_date')->nullable();
             $table->text('special_instructions')->nullable();
             $table->boolean('is_express')->default(false);
             $table->timestamps();
