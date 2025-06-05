@@ -18,4 +18,14 @@ class Customer extends Model
     {
         return $this->hasMany(Order::class);
     }
+
+    public function getOrdersCountAttribute()
+    {
+        return $this->orders()->count();
+    }
+
+    public function getTotalSpentAttribute()
+    {
+        return $this->orders()->sum('total_amount');
+    }
 }
