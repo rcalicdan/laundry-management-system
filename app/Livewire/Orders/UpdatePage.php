@@ -6,8 +6,11 @@ use App\Models\Order;
 use App\Models\Customer;
 use App\Models\LaundryService;
 use App\Enums\OrderStatus;
+use App\Enums\PaymentMethod;
+use App\Enums\PaymentStatus;
 use App\Services\OrderCalculatorService;
 use App\Services\OrderUpdateService;
+use App\Services\PaymentService;
 use Illuminate\Support\Facades\Log;
 use Livewire\Component;
 use Exception;
@@ -24,13 +27,28 @@ class UpdatePage extends Component
     public $laundryServices;
     public $statusOptions;
 
+    // Payment modal properties
+    public $showPaymentModal = false;
+    public $payment_amount;
+    public $payment_method;
+    public $payment_status;
+    public $transaction_id;
+    public $payment_notes;
+    public $paymentMethodOptions;
+    public $paymentStatusOptions;
+
     private OrderCalculatorService $calculator;
     private OrderUpdateService $orderUpdateService;
+    private PaymentService $paymentService;
 
-    public function boot(OrderCalculatorService $calculator, OrderUpdateService $orderUpdateService)
-    {
+    public function boot(
+        OrderCalculatorService $calculator,
+        OrderUpdateService $orderUpdateService,
+        PaymentService $paymentService
+    ) {
         $this->calculator = $calculator;
         $this->orderUpdateService = $orderUpdateService;
+        $this->paymentService = $paymentService;
     }
 
     public function mount(Order $order)
@@ -39,6 +57,7 @@ class UpdatePage extends Component
         $this->order = $order;
         $this->loadOrderData();
         $this->loadInitialData();
+        $this->loadPaymentData();
     }
 
     public function rules(): array
@@ -55,16 +74,36 @@ class UpdatePage extends Component
         ];
     }
 
+    protected function getPaymentRules(): array
+    {
+        return [
+            'payment_amount' => ['required', 'numeric', 'min:0.01'],
+            'payment_method' => ['required', 'in:' . implode(',', PaymentMethod::values())],
+            'payment_status' => ['required', 'in:' . implode(',', PaymentStatus::values())],
+            'transaction_id' => ['nullable', 'string', 'max:255'],
+            'payment_notes' => ['nullable', 'string', 'max:500'],
+        ];
+    }
+
     public function updated($propertyName)
     {
         if ($this->shouldSkipValidation($propertyName)) {
             return;
         }
 
-        $this->validateOnly($propertyName);
+        if (str_starts_with($propertyName, 'payment_') && !$this->showPaymentModal) {
+            return;
+        }
+
+        if (str_starts_with($propertyName, 'payment_')) {
+            $this->validateOnly($propertyName, $this->getPaymentRules());
+        } else {
+            $this->validateOnly($propertyName);
+        }
 
         if ($this->shouldRecalculateSubtotals($propertyName)) {
             $this->calculateSubtotals();
+            $this->updatePaymentAmount();
         }
     }
 
@@ -86,6 +125,7 @@ class UpdatePage extends Component
             unset($this->orderItems[$index]);
             $this->orderItems = array_values($this->orderItems);
             $this->calculateSubtotals();
+            $this->updatePaymentAmount();
         }
     }
 
@@ -103,6 +143,56 @@ class UpdatePage extends Component
     public function getTotalAmount(): float
     {
         return $this->calculator->calculateTotalAmount($this->orderItems);
+    }
+
+    public function openPaymentModal(): void
+    {
+        if (!$this->paymentService->canProcessPayment($this->order)) {
+            $this->addError('payment', 'Cannot process payment for orders with zero total amount.');
+            return;
+        }
+
+        $this->updatePaymentAmount();
+        $this->showPaymentModal = true;
+        $this->resetPaymentValidation();
+    }
+
+    public function closePaymentModal(): void
+    {
+        $this->showPaymentModal = false;
+        $this->resetPaymentValidation();
+    }
+
+    public function processPayment(): void
+    {
+        $this->validate($this->getPaymentRules());
+
+        try {
+            $paymentData = [
+                'amount' => $this->payment_amount,
+                'payment_method' => $this->payment_method,
+                'status' => $this->payment_status,
+                'transaction_id' => $this->transaction_id,
+                'notes' => $this->payment_notes,
+            ];
+
+            $this->paymentService->processPayment($this->order, $paymentData);
+            $this->order->refresh();
+            session()->flash('success', 'Payment processed successfully.');
+            $this->closePaymentModal();
+        } catch (Exception $e) {
+            Log::error('Failed to process payment', [
+                'error' => $e->getMessage(),
+                'order_id' => $this->order->id,
+                'payment_data' => $paymentData ?? [],
+            ]);
+
+            $this->addError('payment', 'Failed to process payment. Please try again.');
+
+            if (config('app.debug')) {
+                $this->addError('payment_debug', 'Debug: ' . $e->getMessage());
+            }
+        }
     }
 
     public function update()
@@ -170,13 +260,45 @@ class UpdatePage extends Component
         $this->customers = Customer::orderBy('name')->get();
         $this->laundryServices = LaundryService::orderBy('name')->get();
         $this->statusOptions = OrderStatus::options();
+        $this->paymentMethodOptions = PaymentMethod::options();
+        $this->paymentStatusOptions = PaymentStatus::options();
+    }
+
+    private function loadPaymentData(): void
+    {
+        $paymentData = $this->paymentService->getPaymentData($this->order);
+
+        $this->payment_amount = $paymentData['amount'];
+        $this->payment_method = $paymentData['payment_method'];
+        $this->payment_status = $paymentData['status'];
+        $this->transaction_id = $paymentData['transaction_id'];
+        $this->payment_notes = $paymentData['notes'];
+    }
+
+    private function updatePaymentAmount(): void
+    {
+        $this->payment_amount = $this->getTotalAmount();
+    }
+
+    private function resetPaymentValidation(): void
+    {
+        $this->resetErrorBag([
+            'payment_amount',
+            'payment_method',
+            'payment_status',
+            'transaction_id',
+            'payment_notes',
+            'payment',
+            'payment_debug'
+        ]);
     }
 
     private function shouldSkipValidation(string $propertyName): bool
     {
         return !str_starts_with($propertyName, 'orderItems.')
             || str_ends_with($propertyName, '.subtotal')
-            || str_ends_with($propertyName, '.price_per_kg');
+            || str_ends_with($propertyName, '.price_per_kg')
+            || $propertyName === 'showPaymentModal';
     }
 
     private function shouldRecalculateSubtotals(string $propertyName): bool
