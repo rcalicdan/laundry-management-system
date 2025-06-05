@@ -6,6 +6,7 @@ use App\Models\User;
 use App\Enums\UserRoles;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Validation\Rule;
+use Illuminate\Validation\Rules\Password;
 use Livewire\Component;
 
 class CreatePage extends Component
@@ -27,8 +28,8 @@ class CreatePage extends Component
         return [
             'name' => ['required', 'min:2', 'max:50'],
             'email' => ['required', 'email', Rule::unique('users', 'email'), 'max:50'],
-            'password' => ['required', 'min:8', 'confirmed'],
-            'password_confirmation' => ['required'],
+            'password' => ['required', 'min:8', Password::defaults()],
+            'password_confirmation' => ['required', 'same:password'],
             'role' => ['required', Rule::in($this->getAvailableRoles())]
         ];
     }

@@ -29,7 +29,8 @@
                     @enderror
                 </div>
 
-                <!-- Role Field -->
+                <!-- Role Field - Only show if user can change roles -->
+                @if($canChangeRole)
                 <div>
                     <label for="role" class="block text-sm font-medium text-gray-700">Role</label>
                     <select id="role" name="role" wire:model.live='role'
@@ -45,6 +46,18 @@
                     <p class="mt-1 text-sm text-red-600">{{ $message }}</p>
                     @enderror
                 </div>
+                @else
+                
+                <!-- Display current role as read-only when user cannot change it -->
+                <div>
+                    <label class="block text-sm font-medium text-gray-700">Role</label>
+                    <div class="mt-1 px-3 py-2 bg-gray-50 border border-gray-300 rounded-md">
+                        <span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-blue-100 text-blue-800">
+                            {{ ucfirst($user->role) }}
+                        </span>
+                    </div>
+                </div>
+                @endif
 
                 <!-- Password Field -->
                 <div>
