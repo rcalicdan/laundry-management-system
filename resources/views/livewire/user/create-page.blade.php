@@ -28,6 +28,23 @@
                     @enderror
                 </div>
 
+                <!-- Role Field -->
+                <div>
+                    <label for="role" class="block text-sm font-medium text-gray-700">Role</label>
+                    <select id="role" name="role" wire:model.live='role'
+                        class="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm"
+                        required>
+                        <option value="">Select a role</option>
+                        @foreach($availableRoles as $roleValue)
+                            <option value="{{ $roleValue }}">{{ ucfirst($roleValue) }}</option>
+                        @endforeach
+                    </select>
+
+                    @error('role')
+                    <p class="mt-1 text-sm text-red-600">{{ $message }}</p>
+                    @enderror
+                </div>
+
                 <!-- Password Field -->
                 <div>
                     <label for="password" class="block text-sm font-medium text-gray-700">Password</label>

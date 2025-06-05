@@ -3,9 +3,10 @@
 namespace App\Livewire\User;
 
 use App\Models\User;
+use App\Enums\UserRoles;
+use Illuminate\Support\Facades\Auth;
 use Livewire\Component;
 use Illuminate\Validation\Rule;
-use Illuminate\Support\Facades\Hash;
 
 class UpdatePage extends Component
 {
@@ -14,6 +15,7 @@ class UpdatePage extends Component
     public $email = '';
     public $password = '';
     public $password_confirmation = '';
+    public $role = '';
 
     public function mount(User $user)
     {
@@ -21,6 +23,7 @@ class UpdatePage extends Component
         $this->user = $user;
         $this->name = $user->name;
         $this->email = $user->email;
+        $this->role = $user->role;
     }
 
     public function rules()
@@ -33,6 +36,7 @@ class UpdatePage extends Component
                 'max:255',
                 Rule::unique('users')->ignore($this->user->id)
             ],
+            'role' => ['required', Rule::in($this->getAvailableRoles())]
         ];
 
         if (!empty($this->password)) {
@@ -51,9 +55,11 @@ class UpdatePage extends Component
     {
         $this->authorize('update', $this->user);
         $this->validate();
+        
         $updateData = [
             'name' => $this->name,
             'email' => $this->email,
+            'role' => $this->role,
         ];
 
         if (!empty($this->password)) {
@@ -64,8 +70,23 @@ class UpdatePage extends Component
         session()->flash('success', 'User updated successfully!');
     }
 
+    public function getAvailableRoles(): array
+    {
+        $currentUser = Auth::user();
+        
+        if ($currentUser->isAdmin()) {
+            return [UserRoles::EMPLOYEE->value, UserRoles::MANAGER->value];
+        } elseif ($currentUser->isManager()) {
+            return [UserRoles::EMPLOYEE->value];
+        }
+        
+        return [];
+    }
+
     public function render()
     {
-        return view('livewire.user.update-page');
+        return view('livewire.user.update-page', [
+            'availableRoles' => $this->getAvailableRoles()
+        ]);
     }
 }
