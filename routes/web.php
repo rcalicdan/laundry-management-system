@@ -15,11 +15,11 @@ Route::get('/', function () {
     return redirect()->route('login');
 })->name('home');
 
-Route::view('dashboard', 'dashboard')
-    ->middleware(['auth'])
-    ->name('dashboard');
+// Route::view('dashboard', 'dashboard')
+//     ->middleware(['auth'])
+//     ->name('dashboard');
 
-// Route::get('dashboard', App\Livewire\Dashboard\Page::class);
+Route::get('dashboard', App\Livewire\Dashboard\Page::class)->middleware(['auth'])->name('dashboard');
 
 Route::middleware(['auth'])->group(function () {
     Route::redirect('settings', 'settings/profile');
