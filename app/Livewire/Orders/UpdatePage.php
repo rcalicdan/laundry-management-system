@@ -26,8 +26,6 @@ class UpdatePage extends Component
     public $customers;
     public $laundryServices;
     public $statusOptions;
-
-    // Payment modal properties
     public $showPaymentModal = false;
     public $payment_amount;
     public $payment_method;
@@ -91,10 +89,6 @@ class UpdatePage extends Component
             return;
         }
 
-        if (str_starts_with($propertyName, 'payment_') && !$this->showPaymentModal) {
-            return;
-        }
-
         if (str_starts_with($propertyName, 'payment_')) {
             $this->validateOnly($propertyName, $this->getPaymentRules());
         } else {
@@ -153,14 +147,15 @@ class UpdatePage extends Component
         }
 
         $this->updatePaymentAmount();
-        $this->showPaymentModal = true;
         $this->resetPaymentValidation();
+        $this->dispatch('open-payment-modal');
     }
+
 
     public function closePaymentModal(): void
     {
-        $this->showPaymentModal = false;
         $this->resetPaymentValidation();
+        $this->dispatch('close-payment-modal');
     }
 
     public function processPayment(): void
@@ -179,7 +174,7 @@ class UpdatePage extends Component
             $this->paymentService->processPayment($this->order, $paymentData);
             $this->order->refresh();
             session()->flash('success', 'Payment processed successfully.');
-            $this->closePaymentModal();
+            $this->dispatch('close-payment-modal');
         } catch (Exception $e) {
             Log::error('Failed to process payment', [
                 'error' => $e->getMessage(),
@@ -221,7 +216,7 @@ class UpdatePage extends Component
             $this->orderUpdateService->updateOrder($this->order, $orderData, $this->orderItems);
 
             session()->flash('success', 'Order updated successfully.');
-            return $this->redirectRoute('orders.table', navigate: true);
+            return $this->redirect(route('orders.show', ['order' => $this->order->id]));
         } catch (Exception $e) {
             $this->handleOrderUpdateError($e, $totalAmount);
         }

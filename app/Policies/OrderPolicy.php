@@ -45,6 +45,6 @@ class OrderPolicy
      */
     public function delete(User $user, Order $order): bool
     {
-        return true;
+        return $user->isAdmin();
     }
 }

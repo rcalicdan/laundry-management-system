@@ -13,7 +13,7 @@ class LaundryServicePolicy
      */
     public function create(User $user): bool
     {
-        return $user->isAdmin();
+        return $user->isAdmin() || $user->isManager();
     }
 
     /**
@@ -21,7 +21,7 @@ class LaundryServicePolicy
      */
     public function update(User $user, LaundryService $model): bool
     {
-        return $user->isAdmin();
+        return $user->isAdmin() || $user->isManager();
     }
 
     /**

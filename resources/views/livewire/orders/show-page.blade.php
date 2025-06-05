@@ -3,7 +3,7 @@
 
     <x-contents.layout>
         <div class="p-4 sm:p-6 lg:p-8">
-
+            <x-flash-session />
             <!-- Back Button -->
             <div class="mb-6">
                 <x-utils.link-button :href="route('orders.table')" button-text="← Back to Orders" />
