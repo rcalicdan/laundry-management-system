@@ -10,7 +10,7 @@
                 <x-utils.link-button :href="route('customers.table')" button-text="← Back to Customers" />
 
                 <!-- Add New Order Button -->
-                <x-utils.link-button :href="route('orders.create', ['customer_id' => $customer->id])"
+                <x-utils.link-button :href="route('orders.create.with-customer', ['customer_id' => $customer->id])"
                     button-text="+ Add New Order" class="bg-green-600 hover:bg-green-700 text-white" />
 
                 <x-utils.search-button searchButtonName="Search Customer Orders" />

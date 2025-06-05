@@ -44,6 +44,7 @@ Route::middleware(['auth'])->group(function () {
     Route::prefix('orders')->name('orders.')->group(function () {
         Route::get('', \App\Livewire\Orders\Table::class)->name('table');
         Route::get('create', \App\Livewire\Orders\CreatePage::class)->name('create');
+        Route::get('create/{customer_id?}', \App\Livewire\Orders\CreatePage::class)->name('create.with-customer');
         Route::get('{order}', \App\Livewire\Orders\ShowPage::class)->name('show');
         Route::get('{order}/edit', \App\Livewire\Orders\UpdatePage::class)->name('edit');
     });
