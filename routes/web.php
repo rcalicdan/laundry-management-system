@@ -16,8 +16,10 @@ Route::get('/', function () {
 })->name('home');
 
 Route::view('dashboard', 'dashboard')
-    ->middleware(['auth', 'verified'])
+    ->middleware(['auth'])
     ->name('dashboard');
+
+// Route::get('dashboard', App\Livewire\Dashboard\Page::class);
 
 Route::middleware(['auth'])->group(function () {
     Route::redirect('settings', 'settings/profile');
