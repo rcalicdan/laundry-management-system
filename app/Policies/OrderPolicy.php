@@ -4,6 +4,8 @@ namespace App\Policies;
 
 use App\Models\Order;
 use App\Models\User;
+use App\Enums\UserRoles;
+use App\Enums\OrderStatus;
 use Illuminate\Auth\Access\Response;
 
 class OrderPolicy
@@ -37,6 +39,13 @@ class OrderPolicy
      */
     public function update(User $user, Order $order): bool
     {
+       if ($user->isEmployee()) {
+            return in_array($order->status, [
+                OrderStatus::PENDING,
+                OrderStatus::IN_PROGRESS
+            ]);
+        }
+
         return true;
     }
 
