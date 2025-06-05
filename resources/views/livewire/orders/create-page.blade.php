@@ -1,5 +1,5 @@
 <section class="w-full">
-    <x-contents.heading title="Create New Order" />
+    <x-contents.heading title="{{ $customer_readonly ? 'Create New Order for ' . $this->getSelectedCustomerName() : 'Create New Order' }}" />
 
     <x-contents.layout>
         <div class="p-4 sm:p-6 lg:p-8">
@@ -30,14 +30,26 @@
                 <!-- Customer Selection -->
                 <div>
                     <label for="customer_id" class="block text-sm font-medium text-gray-700">Customer</label>
-                    <select id="customer_id" wire:model.live='customer_id'
-                        class="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm"
-                        required>
-                        <option value="">Select a customer</option>
-                        @foreach ($customers as $customer)
-                            <option value="{{ $customer->id }}">{{ $customer->name }} - {{ $customer->phone }}</option>
-                        @endforeach
-                    </select>
+                    @if($customer_readonly)
+                        <!-- Read-only customer display -->
+                        <div class="mt-1 block w-full px-3 py-2 bg-gray-100 border border-gray-300 rounded-md shadow-sm sm:text-sm">
+                            <div class="flex items-center justify-between">
+                                <span class="text-gray-900">{{ $this->getSelectedCustomerName() }}</span>
+                                <span class="text-sm text-gray-500 bg-blue-100 text-blue-800 px-2 py-1 rounded-full">Pre-selected</span>
+                            </div>
+                        </div>
+                        <p class="mt-1 text-xs text-gray-500">Customer is pre-selected and cannot be changed for this order.</p>
+                    @else
+                        <!-- Regular customer selection -->
+                        <select id="customer_id" wire:model.live='customer_id'
+                            class="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm"
+                            required>
+                            <option value="">Select a customer</option>
+                            @foreach ($customers as $customer)
+                                <option value="{{ $customer->id }}">{{ $customer->name }} - {{ $customer->phone }}</option>
+                            @endforeach
+                        </select>
+                    @endif
                     @error('customer_id')
                         <p class="mt-1 text-sm text-red-600">{{ $message }}</p>
                     @enderror
@@ -152,7 +164,11 @@
 
                 <!-- Submit Buttons -->
                 <div class="flex justify-end space-x-3">
-                    <x-utils.link-button :href="route('orders.table')" button-text="Cancel" />
+                    @if($customer_readonly)
+                        <x-utils.link-button :href="route('customers.orders', ['customer' => $preselected_customer_id])" button-text="Cancel" />
+                    @else
+                        <x-utils.link-button :href="route('orders.table')" button-text="Cancel" />
+                    @endif
                     <x-utils.submit-button wire-target="create" button-text="Create Order" />
                 </div>
             </form>

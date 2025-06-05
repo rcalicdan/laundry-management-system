@@ -19,10 +19,19 @@ class CreatePage extends Component
     public $orderItems = [];
     public $customers;
     public $laundryServices;
+    public $preselected_customer_id; 
+    public $customer_readonly = false; 
 
-    public function mount()
+    public function mount($customer_id = null)
     {
         $this->loadInitialData();
+        
+        if ($customer_id) {
+            $this->preselected_customer_id = $customer_id;
+            $this->customer_id = $customer_id;
+            $this->customer_readonly = true;
+        }
+        
         $this->addOrderItem();
     }
 
@@ -112,6 +121,11 @@ class CreatePage extends Component
             );
 
             session()->flash('success', 'Order created successfully.');
+            
+            if ($this->preselected_customer_id) {
+                return $this->redirectRoute('customers.orders', ['customer' => $this->preselected_customer_id], navigate: true);
+            }
+            
             return $this->redirectRoute('orders.table', navigate: true);
         } catch (Exception $e) {
             $this->handleOrderCreationError($e, $totalAmount);
@@ -121,6 +135,15 @@ class CreatePage extends Component
     public function render()
     {
         return view('livewire.orders.create-page');
+    }
+
+    public function getSelectedCustomerName(): string
+    {
+        if ($this->customer_id) {
+            $customer = $this->customers->find($this->customer_id);
+            return $customer ? $customer->name : '';
+        }
+        return '';
     }
 
     private function loadInitialData(): void

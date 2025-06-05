@@ -8,6 +8,11 @@
             <x-contents.table-head>
                 <!-- Back Button -->
                 <x-utils.link-button :href="route('customers.table')" button-text="← Back to Customers" />
+
+                <!-- Add New Order Button -->
+                <x-utils.link-button :href="route('orders.create', ['customer_id' => $customer->id])"
+                    button-text="+ Add New Order" class="bg-green-600 hover:bg-green-700 text-white" />
+
                 <x-utils.search-button searchButtonName="Search Customer Orders" />
             </x-contents.table-head>
 
@@ -132,6 +137,12 @@
                         <tr>
                             <td colspan="8" class="px-6 py-4 text-center text-sm text-gray-500">
                                 No orders found for this customer.
+                                <div class="mt-2">
+                                    <a href="{{ route('orders.create', ['customer_id' => $customer->id]) }}"
+                                        class="text-indigo-600 hover:text-indigo-500 font-medium">
+                                        Create the first order for this customer
+                                    </a>
+                                </div>
                             </td>
                         </tr>
                         @endforelse
