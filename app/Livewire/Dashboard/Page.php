@@ -16,6 +16,8 @@ class Page extends Component
 {
     public function render()
     {
+        $this->authorize('view-dashboard');
+        
         // Summary Cards Data
         $totalCustomers = Customer::count();
         $totalOrders = Order::count();

@@ -15,9 +15,10 @@
 
         <flux:navlist variant="outline">
             <flux:navlist.group :heading="__('Platform')" class="grid">
+                @can('view-dashboard')
                 <flux:navlist.item icon="home" :href="route('dashboard')" :current="request()->routeIs('dashboard')"
                     wire:navigate>{{ __('Dashboard') }}</flux:navlist.item>
-
+                @endcan
                 @can('viewAny', App\Models\User::class)
                 <flux:navlist.item icon="user" :href="route('users.table')" :current="request()->routeIs('users*')"
                     wire:navigate>{{ __('Users') }}</flux:navlist.item>
@@ -31,7 +32,7 @@
                     :current="request()->routeIs('customers*')" wire:navigate>{{ __('Customers') }}
                 </flux:navlist.item>
 
-                 <flux:navlist.item icon="document-currency-dollar" :href="route('orders.table')"
+                <flux:navlist.item icon="document-currency-dollar" :href="route('orders.table')"
                     :current="request()->routeIs('orders*')" wire:navigate>{{ __('Orders') }}
                 </flux:navlist.item>
             </flux:navlist.group>
@@ -131,6 +132,7 @@
 
     {{ $slot }}
 
+    @stack('scripts')
     @fluxScripts
 </body>
 

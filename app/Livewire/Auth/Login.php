@@ -43,6 +43,11 @@ class Login extends Component
         RateLimiter::clear($this->throttleKey());
         Session::regenerate();
 
+        if (Auth::user()->isEmployee())
+        {
+            $this->redirectIntended(default: route('laundry-services.table', absolute: false), navigate: true);
+        }
+        
         $this->redirectIntended(default: route('dashboard', absolute: false), navigate: true);
     }
 
