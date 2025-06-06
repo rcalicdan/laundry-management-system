@@ -16,13 +16,13 @@ class PaymentService
     {
         return DB::transaction(function () use ($order, $paymentData) {
             $payment = $order->payment ?? new Payment();
-            
+
             $payment->fill([
                 'order_id' => $order->id,
                 'amount' => $paymentData['amount'],
                 'payment_method' => PaymentMethod::from($paymentData['payment_method']),
                 'status' => PaymentStatus::from($paymentData['status']),
-                'transaction_id' => $paymentData['transaction_id'] ?? null,
+                'transaction_id' => !empty($paymentData['transaction_id']) ? $paymentData['transaction_id'] : null, // Convert empty to null
                 'notes' => $paymentData['notes'] ?? null,
             ]);
 
@@ -47,7 +47,7 @@ class PaymentService
     public function getPaymentData(Order $order): array
     {
         $payment = $order->payment;
-        
+
         return [
             'amount' => $payment ? $payment->amount : $order->total_amount,
             'payment_method' => $payment ? $payment->payment_method->value : '',

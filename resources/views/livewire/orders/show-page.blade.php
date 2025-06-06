@@ -6,7 +6,7 @@
             <x-flash-session />
             <!-- Back Button -->
             <div class="mb-6">
-                <x-utils.link-button :href="url()->previous(true)" button-text="← Back to Orders" />
+                <x-utils.link-button :href="route('orders.table')" button-text="← Back to Orders" />
             </div>
 
             <!-- Order Information Card -->
